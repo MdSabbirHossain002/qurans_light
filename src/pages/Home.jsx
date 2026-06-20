@@ -97,7 +97,7 @@ useEffect(() => {
             {currentVerse.category}
           </span>
           
-          <h2 className="text-2xl md:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-8 leading-loose md:leading-loose transition-colors duration-500 drop-shadow-sm" dir="rtl" style={{ fontFamily: "'Scheherazade New', serif" }}>
+          <h2 className="text-2xl md:text-2xl lg:text-3xl text-gray-900 dark:text-white mb-8 leading-loose md:leading-loose transition-colors duration-500 drop-shadow-sm" dir="rtl" style={{ fontFamily: "'Amiri', serif" }}>
             {currentVerse.arabic_indopak}
           </h2>
 

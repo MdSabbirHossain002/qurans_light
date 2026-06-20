@@ -2,6 +2,8 @@ import { useState } from "react";
 import { collection, addDoc } from "firebase/firestore";
 import { db } from "../firebase";
 
+
+
 export default function Admin() {
   // Login States
   const [isAuthenticated, setIsAuthenticated] = useState(false);
