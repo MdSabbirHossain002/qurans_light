@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* Manual Dark Mode (Class Strategy) for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ডার্ক মোডের জন্য v4-এ এই থিম কনফিগারেশনটি CSS-এর ভেতরেই করতে হয় */
+@theme {
+  --color-primary: #10b981; /* Emerald 500 */
+  --color-primary-dark: #059669; /* Emerald 600 */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
