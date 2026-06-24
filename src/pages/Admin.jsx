@@ -93,8 +93,7 @@ export default function Admin() {
       let aiText = geminiData.candidates[0].content.parts[0].text.trim();
       
       // Fixed Regex line break issue
-      aiText = aiText.replace(/```json/gi, '').replace(/
-```/g, '').trim();
+      aiText = aiText.replace(/```json/gi, '').replace(/```/g, '').trim();
       const aiResponse = JSON.parse(aiText);
 
       // Unsplash API Fetch
