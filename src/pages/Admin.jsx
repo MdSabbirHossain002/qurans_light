@@ -15,12 +15,18 @@ export default function Admin() {
   const [filterCategory, setFilterCategory] = useState("All");
   const [categories, setCategories] = useState([]);
   
+  // === Loading & Error States for List ===
+  const [listLoading, setListLoading] = useState(true);
+  const [listError, setListError] = useState("");
+  
   // === Edit Category States ===
   const [editingId, setEditingId] = useState(null);
   const [editCategoryVal, setEditCategoryVal] = useState("");
 
   // ১. ফায়ারবেস থেকে সব আয়াত নিয়ে আসার ফাংশন
   const fetchVersesList = async () => {
+    setListLoading(true);
+    setListError("");
     try {
       const querySnapshot = await getDocs(collection(db, "verses"));
       const versesArray = [];
@@ -34,6 +40,9 @@ export default function Admin() {
       setCategories(uniqueCategories);
     } catch (error) {
       console.error("Error fetching verses list:", error);
+      setListError(error.message); // স্ক্রিনে এরর দেখানোর জন্য
+    } finally {
+      setListLoading(false);
     }
   };
 
@@ -82,6 +91,8 @@ export default function Admin() {
       
       const geminiData = await geminiRes.json();
       let aiText = geminiData.candidates[0].content.parts[0].text.trim();
+      
+      // Fixed Regex line break issue
       aiText = aiText.replace(/```json/gi, '').replace(/
 ```/g, '').trim();
       const aiResponse = JSON.parse(aiText);
@@ -184,7 +195,6 @@ export default function Admin() {
           <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Manage Verses ({filteredVerses.length})</h2>
             
-            
             <select 
               value={filterCategory} 
               onChange={(e) => setFilterCategory(e.target.value)}
@@ -196,7 +206,6 @@ export default function Admin() {
             </select>
           </div>
 
-          
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -208,7 +217,25 @@ export default function Admin() {
                 </tr>
               </thead>
               <tbody>
-                {filteredVerses.map((verse) => (
+                
+                {listLoading && (
+                  <tr>
+                    <td colSpan="4" className="p-8 text-center text-emerald-600 font-bold animate-pulse">Loading verses from database...</td>
+                  </tr>
+                )}
+                
+                
+                {listError && (
+                  <tr>
+                    <td colSpan="4" className="p-8 text-center text-red-500 font-bold">
+                      Error loading list: {listError} <br/> 
+                      <span className="text-sm font-normal text-gray-500 mt-2 block">If it says 'Missing or insufficient permissions', please check your Firebase Firestore rules.</span>
+                    </td>
+                  </tr>
+                )}
+
+                
+                {!listLoading && !listError && filteredVerses.map((verse) => (
                   <tr key={verse.id} className="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition">
                     <td className="p-4 font-bold whitespace-nowrap">
                       {verse.suraName} ({verse.sura}:{verse.ayat})
@@ -217,7 +244,6 @@ export default function Admin() {
                       {verse.english}
                     </td>
                     <td className="p-4">
-                      
                       {editingId === verse.id ? (
                         <div className="flex items-center gap-2">
                           <input 
@@ -236,7 +262,6 @@ export default function Admin() {
                       )}
                     </td>
                     <td className="p-4 flex gap-3">
-                      
                       <button 
                         onClick={() => { setEditingId(verse.id); setEditCategoryVal(verse.category); }}
                         className="text-blue-500 hover:text-blue-700 p-1 bg-blue-50 dark:bg-blue-900/20 rounded"
@@ -254,9 +279,11 @@ export default function Admin() {
                     </td>
                   </tr>
                 ))}
-                {filteredVerses.length === 0 && (
+
+                
+                {!listLoading && !listError && filteredVerses.length === 0 && (
                   <tr>
-                    <td colSpan="4" className="p-8 text-center text-gray-500">No verses found in this category.</td>
+                    <td colSpan="4" className="p-8 text-center text-gray-500">No verses found.</td>
                   </tr>
                 )}
               </tbody>
