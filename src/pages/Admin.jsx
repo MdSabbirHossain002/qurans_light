@@ -70,11 +70,16 @@ export default function Admin() {
       const audioData = await audioRes.json();
       const audio = audioData.data.audio;
 
+      // Gemini API Fetch (Category & Keyword)
       const prompt = `Analyze this Quranic verse translation: "${english}". 
       Return a valid JSON object with exactly two keys:
       1. "category": Choose EXACTLY ONE category from this strict list: ["Faith", "Prayer", "Mercy", "Warning", "Patience", "Guidance", "Hereafter", "Charity", "Prophets", "Forgiveness", "Motivation", "Loneliness", "Peace", "Sadness", "Gratitude", "Hope", "Healing", "Hardship", "Love", "Justice", "Wisdom", "Anxiety", "Joy", "Reflection", "Trust"].
-      2. "image_keyword": A 1-2 word aesthetic visual search term for Unsplash that captures the VIBE of the verse.`;
-
+      2. "image_keyword": Provide a 1-3 word highly specific visual search term for Unsplash. 
+      - RULE 1: Prioritize elegant Islamic/spiritual aesthetics if appropriate for the verse (e.g., "mosque silhouette", "Islamic arch", "lantern", "crescent moon", "prayer beads", "dome").
+      - RULE 2: If religious objects don't fit the verse's exact meaning, use majestic, peaceful nature elements that evoke a spiritual feeling (e.g., "starry night sky", "light rays", "calm ocean", "desert night").
+      - RULE 3: STRICTLY avoid human faces, animals, or modern busy objects. The vibe must be minimal, religious, and suitable for a Quranic background.`;
+      
+      
       const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
