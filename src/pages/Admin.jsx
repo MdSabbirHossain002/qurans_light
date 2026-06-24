@@ -63,8 +63,7 @@ export default function Admin() {
       const audioUrl = audioData.data.audio;
 
 
-      // ২. Gemini API Fetch
-      // ২. Gemini API Fetch (Updated Prompt for Specific Categories)
+      // ২. Gemini API Fetch (Updated with Strict JSON Enforcement)
       const prompt = `Analyze this Quranic verse translation: "${english}". 
       Return a valid JSON object with exactly two keys:
       1. "category": Choose EXACTLY ONE category from this strict list: [
@@ -75,17 +74,27 @@ export default function Admin() {
       2. "image_keyword": A 1-2 word aesthetic visual search term for Unsplash that captures the VIBE of the verse (e.g., "stormy ocean", "sunlight clouds", "desert night", "peaceful dawn", "stars", "fire", "hell", "haven", "mountain"). 
       Do not add any markdown formatting, only output the pure JSON.`;
 
+      // API কনফিগারেশনে responseMimeType যোগ করা হয়েছে যাতে জেমিনি বাধ্য হয়ে শুধু JSON দেয়
       const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        body: JSON.stringify({ 
+          contents: [{ parts: [{ text: prompt }] }],
+          // 👇 এই কনফিগারেশনটি জেমিনিকে বাধ্য করবে একদম ক্লিন JSON রিটার্ন করতে
+          generationConfig: {
+            responseMimeType: "application/json"
+          }
+        })
       });
       
-      if (!geminiRes.ok) throw new Error("Gemini API Error! Failed to generate category.");
+      if (!geminiRes.ok) throw new Error("Gemini API Error! Please check your API Key.");
 
       const geminiData = await geminiRes.json();
-      let aiText = geminiData.candidates[0].content.parts[0].text;
-      aiText = aiText.replace(/```json/g, '').replace(/```/g, '').trim();
+      let aiText = geminiData.candidates[0].content.parts[0].text.trim();
+      
+      // সেফটি ক্লিনিং (সব ধরণের ব্যাকটিক্স এবং এক্সট্রা টেক্সট সরানোর জন্য)
+      aiText = aiText.replace(/```json/gi, '').replace(/```/g, '').trim();
+      
       const aiResponse = JSON.parse(aiText);
 
       // ৩. Unsplash API Fetch
